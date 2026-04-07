@@ -16,12 +16,13 @@ class Solver:
 
     def rostics_load(self):
         count = 0
-        for i in range(10):
+        while count < 10:
             load = random.randint(0,100)
-            print(load)
-
+            
             if load > 85:
                 print(f"Крылышки в опасности! Нагрузка - {load}")
+            time.sleep(0.2)
+            count += 1
                 
 
 practice = Solver()
