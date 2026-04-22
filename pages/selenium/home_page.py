@@ -1,29 +1,36 @@
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+
 from pages.selenium.base_page import BasePage
+
 
 class HomePage(BasePage):
     URL = "https://github.com/"
-    SOLUTIONS_BUTTON = (
-        By.XPATH,
-        "//button[normalize-space()='Solutions' and @aria-expanded]",
-    )
-    RESOURCES_BUTTON = (
-        By.XPATH,
-        "//button[normalize-space()='Resources' and @aria-expanded]",
+    HEADER_MENU_BUTTONS = (
+        By.CSS_SELECTOR,
+        "button.js-details-target, button[class*='NavDropdown-module__button']",
     )
 
     def open(self, url: str | None = None):
         super().open(url or self.URL)
 
+    def _get_menu_button(self, title: str):
+        def find_button(_driver):
+            for button in _driver.find_elements(*self.HEADER_MENU_BUTTONS):
+                if button.is_displayed() and button.text.strip() == title:
+                    return button
+            return False
+
+        return self.wait.until(find_button)
+
     def open_solutions_menu(self):
-        button = self.wait_visible(self.SOLUTIONS_BUTTON)
+        button = self._get_menu_button("Solutions")
         ActionChains(self.driver).move_to_element(button).perform()
         if button.get_attribute("aria-expanded") != "true":
-            self.click(self.SOLUTIONS_BUTTON)
+            button.click()
 
     def open_resources_menu(self):
-        button = self.wait_visible(self.RESOURCES_BUTTON)
+        button = self._get_menu_button("Resources")
         ActionChains(self.driver).move_to_element(button).perform()
         if button.get_attribute("aria-expanded") != "true":
-            self.click(self.RESOURCES_BUTTON)
+            button.click()

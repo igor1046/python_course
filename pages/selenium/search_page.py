@@ -5,14 +5,8 @@ from pages.selenium.base_page import BasePage
 
 class SearchPage(BasePage):
     URL = "https://duckduckgo.com/"
-    SEARCH_INPUT = (
-        By.XPATH,
-        "//input[@name='q' and (@type='text' or @type='search')] | //textarea[@name='q']",
-    )
-    RESULTS = (
-        By.CSS_SELECTOR,
-        "article[data-testid='result'], div[data-testid='result'], .react-results--main article",
-    )
+    SEARCH_INPUT = (By.CSS_SELECTOR, 'input[name="q"]')
+    RESULTS = (By.CSS_SELECTOR, "article[data-testid='result'], div[data-testid='result']")
 
     def open(self, url: str | None = None):
         super().open(url or self.URL)

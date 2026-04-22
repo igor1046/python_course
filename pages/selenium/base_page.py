@@ -1,39 +1,49 @@
+from typing import TypeAlias
+
+from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
-class BasePage:
-    def __init__(self, driver: WebDriver):
-        self.driver = driver
-        self.wait = WebDriverWait(driver, 15)
+Locator: TypeAlias = tuple[str, str] | str
+DEFAULT_TIMEOUT = 15
 
-    def open(self, url: str):
+
+class BasePage:
+    def __init__(self, driver: WebDriver, timeout: int = DEFAULT_TIMEOUT):
+        self.driver = driver
+        self.wait = WebDriverWait(driver, timeout)
+
+    def open(self, url: str) -> None:
         self.driver.get(url)
 
-    def wait_visible(self, locator: tuple[str, str]):
-        return self.wait.until(ec.visibility_of_element_located(locator))
+    def _by(self, locator: Locator) -> tuple[str, str]:
+        if isinstance(locator, str):
+            return By.CSS_SELECTOR, locator
+        return locator
 
-    def wait_clickable(self, locator: tuple[str, str]):
-        return self.wait.until(ec.element_to_be_clickable(locator))
+    def wait_visible(self, locator: Locator):
+        return self.wait.until(ec.visibility_of_element_located(self._by(locator)))
 
-    def click(self, locator: tuple[str, str]):
+    def wait_clickable(self, locator: Locator):
+        return self.wait.until(ec.element_to_be_clickable(self._by(locator)))
+
+    def click(self, locator: Locator) -> None:
         self.wait_clickable(locator).click()
 
-    def fill(self, locator: tuple[str, str], value: str):
+    def fill(self, locator: Locator, value: str) -> None:
         element = self.wait_visible(locator)
         element.clear()
         element.send_keys(value)
 
-    def should_have_text(self, locator: tuple[str, str], text: str):
-        element = self.wait_visible(locator)
-        assert element.text == text
+    def should_have_text(self, locator: Locator, text: str) -> None:
+        assert self.wait_visible(locator).text == text
 
-    def should_contain_text(self, locator: tuple[str, str], text: str):
-        element = self.wait_visible(locator)
-        assert text in element.text
+    def should_contain_text(self, locator: Locator, text: str) -> None:
+        assert text in self.wait_visible(locator).text
 
-    def should_be_visible(self, locator: tuple[str, str]):
+    def should_be_visible(self, locator: Locator) -> None:
         self.wait_visible(locator)
 
-    def get_value(self, locator: tuple[str, str]) -> str | None:
+    def get_value(self, locator: Locator) -> str | None:
         return self.wait_visible(locator).get_attribute("value")
