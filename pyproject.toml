@@ -1,16 +1,27 @@
-[project]
-name = "sprint-one"
+[tool.poetry]
+name = "sprint-3"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "Your Name",email = "you@example.com"}
-]
-requires-python = ">=3.14"
-dependencies = [
-    "pytest (>=9.0.2,<10.0.0)"
-]
+description = "UI Automation Practice Sprint 3"
+authors = ["Igor <igorpushkarev22@gmail.com>"]
+package-mode = false
 
+[tool.poetry.dependencies]
+python = ">=3.11"
+pytest = "^8.3"
+python-dotenv = "^1.0"
+faker = "^37.1"
 
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.group.playwright.dependencies]
+playwright = "^1.48"
+pytest-playwright = "^0.7"
+
+[tool.poetry.group.selenium.dependencies]
+selenium = "^4.31"
+webdriver-manager = "^4.0"
+selene = "^1.0.2"
+
+[tool.poetry.group.dev.dependencies]
+allure-pytest = "^2.13"
+black = "^24.8"
+ruff = "^0.6"
+isort = "^8.0.1"
