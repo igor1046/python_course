@@ -11,6 +11,7 @@ pytest = "^8.3"
 python-dotenv = "^1.0"
 faker = "^37.1"
 requests = "^2.33.1"
+pydantic = "^2.13.3"
 
 [tool.poetry.group.playwright.dependencies]
 playwright = "^1.48"
