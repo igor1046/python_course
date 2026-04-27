@@ -1,8 +1,13 @@
-name: Run tests
+name: Run tests + Allure + Pages
 
 on:
   push:
   pull_request:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   tests:
@@ -31,8 +36,7 @@ jobs:
       - name: Install Playwright browsers
         run: poetry run playwright install --with-deps
 
-      #запуск только sample теста
-      - name: Run tests
+      - name: Run tests (sample only)
         run: |
           mkdir -p reports
           poetry run pytest tests/test_sample.py \
@@ -40,21 +44,6 @@ jobs:
             --junitxml=reports/junit.xml \
             --alluredir=reports/allure-results
 
-      # JUnit отчет
-      - name: Upload JUnit report
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-report
-          path: reports/junit.xml
-
-      # Allure raw results
-      - name: Upload Allure results
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-results
-          path: reports/allure-results
-
-      #ставим официальный Allure CLI
       - name: Install Allure CLI
         run: |
           sudo apt-get update
@@ -66,14 +55,30 @@ jobs:
           sudo mv allure-2.27.0 /opt/allure
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
-      # генерация HTML отчёта
       - name: Generate Allure HTML report
         run: |
           allure generate reports/allure-results -o reports/allure-report --clean
 
-      # Publish Allure
-      - name: Upload Allure HTML report
-        uses: actions/upload-artifact@v4
+      - name: Prepare Pages folder
+        run: |
+          rm -rf public
+          mkdir -p public
+          cp -r reports/allure-report/* public/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: allure-html-report
-          path: reports/allure-report
+          path: public
+
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
