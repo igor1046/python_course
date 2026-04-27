@@ -2,6 +2,8 @@ name: Run tests + Allure + Pages
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 permissions:
@@ -27,16 +29,13 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Configure Poetry
-        run: poetry config virtualenvs.in-project true
-
       - name: Install dependencies
         run: poetry install --no-interaction --no-ansi
 
       - name: Install Playwright browsers
         run: poetry run playwright install --with-deps
 
-      - name: Run tests (sample only)
+      - name: Run tests (only sample)
         run: |
           mkdir -p reports
           poetry run pytest tests/test_sample.py \
@@ -55,7 +54,7 @@ jobs:
           sudo mv allure-2.27.0 /opt/allure
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
-      - name: Generate Allure HTML report
+      - name: Generate Allure report
         run: |
           allure generate reports/allure-results -o reports/allure-report --clean
 
@@ -71,6 +70,7 @@ jobs:
           path: public
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: tests
     runs-on: ubuntu-latest
 
