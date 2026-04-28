@@ -18,6 +18,7 @@ allure-pytest = "^2.16.0"
 flake8 = "^7.3.0"
 isort = "^8.0.1"
 mypy = "^1.20.2"
+types-requests = "^2.33.0.20260408"
 
 [tool.poetry.group.playwright.dependencies]
 playwright = "^1.48"
